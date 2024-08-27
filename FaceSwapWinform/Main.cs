@@ -16,27 +16,26 @@ namespace FaceSwapWinform
 
         private void Main_Load(object sender, EventArgs e)
         {
-            this.Size = new Size(1280, 720);
             this.CenterToScreen();
 
             // load the input image
-            var bitmap = Bitmap.FromFile("./input.jpg") as Bitmap;
+            var bitmap = Bitmap.FromFile("../../../input.jpg") as Bitmap;
 
             // load the face to swap
-            var bitmapToSwap = Bitmap.FromFile("./selfie.jpg") as Bitmap;
+            var bitmapToSwap = Bitmap.FromFile("../../../selfie.jpg") as Bitmap;
 
             // process image
             var newBitmap = ProcessImage(bitmap!, bitmapToSwap!);
 
             // show new image
-            pictureBox1.Image = newBitmap;
+            outputPicBox.Image = newBitmap;
         }
 
         private static Bitmap ProcessImage(Bitmap image, Bitmap newImage)
         {
             // set up Dlib facedetectors and 
             using var fd = Dlib.GetFrontalFaceDetector();
-            using var sp = ShapePredictor.Deserialize("./shape_predictor_68_face_landmarks.dat");
+            using var sp = ShapePredictor.Deserialize("../../../shape_predictor_68_face_landmarks.dat");
 
             // convert image to dlib format
             //var compatibleImage = image.Clone(new Rectangle(0, 0, image.Width, image.Height), PixelFormat.Format24bppRgb);
@@ -49,13 +48,13 @@ namespace FaceSwapWinform
             // get target's landmark points
             var targetShape = sp.Detect(img, target);
             var targetPoints = (from i in Enumerable.Range(0, (int)targetShape.Parts)
-                                 let p = targetShape.GetPart((uint)i)
-                                 select new OpenCvSharp.Point(p.X, p.Y)).ToArray();
+                                let p = targetShape.GetPart((uint)i)
+                                select new OpenCvSharp.Point(p.X, p.Y)).ToArray();
 
             // get convex hull of target's points
             var hull = Cv2.ConvexHullIndices(targetPoints);
             var targetHull = from i in hull
-                              select targetPoints[i];
+                             select targetPoints[i];
 
             // find landmark points in face to 
             var imgMark = newImage.ToArray2D<RgbPixel>();
@@ -63,13 +62,13 @@ namespace FaceSwapWinform
             var source = faces2[0];
             var sourceShape = sp.Detect(imgMark, source);
             var sourcePoints = (from i in Enumerable.Range(0, (int)sourceShape.Parts)
-                              let p = sourceShape.GetPart((uint)i)
-                              select new OpenCvSharp.Point(p.X, p.Y)).ToArray();
+                                let p = sourceShape.GetPart((uint)i)
+                                select new OpenCvSharp.Point(p.X, p.Y)).ToArray();
 
             // get convex hull of source's points
             var hull2 = Cv2.ConvexHullIndices(targetPoints);
             var sourceHull = from i in hull2
-                           select sourcePoints[i];
+                             select sourcePoints[i];
 
             // calculate Delaunay triangles
             var triangles = Utility.GetDelaunayTriangles(targetHull);
