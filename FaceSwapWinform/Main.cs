@@ -19,10 +19,10 @@ namespace FaceSwapWinform
             this.CenterToScreen();
 
             // load the input image
-            var bitmap = Bitmap.FromFile("../../../input.jpg") as Bitmap;
+            var bitmap = Bitmap.FromFile("./input.jpg") as Bitmap;
 
             // load the face to swap
-            var bitmapToSwap = Bitmap.FromFile("../../../selfie.jpg") as Bitmap;
+            var bitmapToSwap = Bitmap.FromFile("./selfie.jpg") as Bitmap;
 
             // process image
             var newBitmap = ProcessImage(bitmap!, bitmapToSwap!);
@@ -35,7 +35,7 @@ namespace FaceSwapWinform
         {
             // set up Dlib facedetectors and 
             using var fd = Dlib.GetFrontalFaceDetector();
-            using var sp = ShapePredictor.Deserialize("../../../shape_predictor_68_face_landmarks.dat");
+            using var sp = ShapePredictor.Deserialize("./shape_predictor_68_face_landmarks.dat");
 
             // convert image to dlib format
             //var compatibleImage = image.Clone(new Rectangle(0, 0, image.Width, image.Height), PixelFormat.Format24bppRgb);
